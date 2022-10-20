@@ -7,4 +7,3 @@ class Slider:
         self.p = 8  # position of the blank
         self.path = ""  # string to track previous actions taken
 
-
