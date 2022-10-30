@@ -7,17 +7,22 @@ class Search:
         self.pastDict = {}
         self.origin = Slider
         self.name = ""
+        self.parsed = 0
+        self.maxQueueSize = 0
 
     def search(self):
         self.nodes.append(self.origin)
         numParsed = 0
         while(True):
+            if len(self.nodes) > self.maxQueueSize:
+                self.maxQueueSize = len(self.nodes)
             if not self.nodes:
                 return self.origin
             current = self.nodes.pop(0)
             numParsed += 1
             if current.isCorrect():
                 print (self.getName() + " checked through " + str(numParsed) + " states and found a solution at depth " + str(current.getDepth()) + ".")
+                self.parsed = numParsed
                 return current
             self.queue(current)
 
@@ -55,6 +60,10 @@ class Search:
             print("The best state to expand with a g(n) = " + str(holder.getDepth()) + self.getHeuristicStatement(holder) + " is...")
             holder.printGrid()
             path = path[1:]
+        print("Goal State!\n")
+        print("Solution depth was " + str(len(route)) + ", taking the path " + str(route) + ".")
+        print("Number of nodes expanded: " + str(self.parsed))
+        print("Max queue size: " + str(self.maxQueueSize) + "\n")
 
 class UniformSearch(Search):
     def getName(self):
