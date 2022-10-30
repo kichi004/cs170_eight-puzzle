@@ -1,36 +1,15 @@
 import py_compile
 
 from slider import Slider
-from queue import Queue
+from search import Search, UniformSearch, ManhattanSearch, MisplacedSearch
 
 list = [8, 7, 1, 6, 9, 2, 5, 4, 3]
 
-x = Slider()
-x.input(list)
-y = Slider()
-y.input(list)
-z = Slider()
-z.input(list)
+x = Slider(list)
 
-u = Queue()
-i = Queue()
-a = Queue()
-# '''
-ua = u.uniform_search(x)
-ua.printGrid()
-print(ua.getPath())
-print(len(ua.getPath()))
-x.followPathDetailed(ua.getPath())
-'''
-ia = i.misplaced_search(y)
-ia.printGrid()
-print(ia.getPath())
-print(len(ia.getPath()))
-y.followPathDetailed(ia.getPath())
+searcher = Search(x)
+searcher.__class__ = ManhattanSearch
 
-aa = a.manhattan_search(z)
-aa.printGrid()
-print(aa.getPath())
-print(len(aa.getPath()))
-z.followPathDetailed(aa.getPath())
-'''
+y = searcher.search()
+searcher.followSolution(y.getPath())
+

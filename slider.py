@@ -4,199 +4,162 @@ from operator import truediv
 
 class Slider:
     def __init__(self):
-        self.list = [1, 2, 3, 4, 5, 6, 7, 8, 9]   # array representing the game board, 9 = blank
+        self.board = [1, 2, 3, 4, 5, 6, 7, 8, 9]   # array representing the game board, highest value = blank
         self.len = 3  # side length of the array
         self.pos = 8  # position of the blank
         self.path = ""  # string to track previous actions taken
+    
+    def __init__(self, board): # alternate initialization to add custom board state
+        pass
+        self.input(board)
 
-    def swapPositions(self, pos1, pos2):
-        store = self.list[pos1]
-        self.list[pos1] = self.list[pos2]
-        self.list[pos2] = store
+    def swap(self, pos1, pos2): # swaps the position of two tiles, no checks involved
+        store = self.board[pos1]
+        self.board[pos1] = self.board[pos2]
+        self.board[pos2] = store
 
-    def checkCorrect(self):
+    def isCorrect(self): # checks if the board is correct
         prev = 0
-        for i in range(len(self.list)):
-            if (self.list[i] > prev):
+        for i in range(len(self.board)):
+            if (self.board[i] > prev):
                 prev += 1
             else:
                 return False
         return True
 
-    def input(self, olist):
-        self.list = olist
+    def input(self, newBoard): # used to input a custom board into an already existing slider
+        self.board = newBoard
         self.path = ""
-        self.pos = self.findBlank()
-        self.len = math.sqrt(len(self.list))
+        self.pos = self.findBlankPosition()
+        self.len = math.sqrt(len(self.board))
 
-    def getList(self):
-        return self.list
+    def getBoard(self): # returns the board state as a list object
+        return self.board
 
-    def equalsList(self, olist):
-        if (olist == self.list):
+    def isEqual(self, newBoard): # checks if the list objects of two boards are equal, no other checks
+        if (newBoard == self.board):
             return True
         else:
             return False
 
-    def findBlank(self):
-        blankPos = 0
-        for i in range(len(self.list)):
-            if self.list[blankPos] < self.list[i]:
-                blankPos = i
-        return blankPos
+    def findBlankPosition(self): # finds the highest value in the list to determine the blank position, does not set
+        blankPosition = 0
+        for i in range(len(self.board)):
+            if self.board[blankPosition] < self.board[i]:
+                blankPosition = i
+        return blankPosition
 
-    def printGrid(self):
+    def printGrid(self): # prints the grid, adaptive for different sizes but doesn't look great with double digits
         cnt = 1
         print("[[", end="")
-        for x in range(len(self.list)):
+        for x in range(len(self.board)):
             cnt += 1
             if x == self.pos:
                 print("X", end="")
             else:
-                print(self.list[x], end="")
+                print(self.board[x], end="")
             if cnt > self.len:
                 print("]", end="")
                 cnt = 1
-                if (x+1 != len(self.list)):
+                if (x+1 != len(self.board)):
                     print()
                     print(" [", end="")
             else:
                 print(", ", end="")
         print("]", end="\n\n")
 
-    def printGridMisplaced(self):
-        print("H(n) is equal to ", end="")
-        print(str(self.getMisplacedTilesHeuristic()))
-        self.printGrid()
-
-    def printGridManhattan(self):
-        print("H(n) is equal to ", end="")
-        print(str(self.getManhattanHeuristic()))
-        self.printGrid()
-
-    def checkBounds(self, p):
-        if (p > len(self.list)-1):
+    def checkBounds(self, p): # makes sure that the new position on the board does not go outside of the range of the list
+        if (p > len(self.board)-1):
             return False
         elif (p < 0):
             return False
         else:
             return True
     
-    def moveUp(self):
+    def moveUp(self): # moves the blank up by subtracting 3 
         newPos = self.pos-3
         if (self.checkBounds(newPos)):
-            self.swapPositions(self.pos, newPos)
+            self.swap(self.pos, newPos)
             self.pos = newPos
             self.path += "U"
             return True
         else: 
             return False
     
-    def moveDown(self):
+    def moveDown(self): # moves the blank down by adding 3
         newPos = self.pos+3
         if (self.checkBounds(newPos)):
-            self.swapPositions(self.pos, newPos)
+            self.swap(self.pos, newPos)
             self.pos = newPos
             self.path += "D"
             return True
         else: 
             return False
 
-    def moveLeft(self):
+    def moveLeft(self): # moves the blank left by subtracting 1
         newPos = self.pos-1
         if (self.pos%self.len!=0):
-            self.swapPositions(self.pos, newPos)
+            self.swap(self.pos, newPos)
             self.pos = newPos
             self.path += "L"
             return True
         else: 
             return False
     
-    def moveRight(self):
+    def moveRight(self): # moves the blank right by subtracting 1
         newPos = self.pos+1
         if (self.pos%self.len != (self.len-1)):
-            self.swapPositions(self.pos, newPos)
+            self.swap(self.pos, newPos)
             self.pos = newPos
             self.path += "R"
             return True
         else: 
             return False
 
-    def getPath(self):
+    def getPath(self): # returns the string path of the moves the slider object has taken so far
         return self.path
     
-    def followPath(self, route):
-        for i in range(len(route)):
-            if (route[i] == "U"):
-                self.moveUp()
-            elif (route[i] == "D"):
-                self.moveDown()
-            elif (route[i] == "L"):
-                self.moveLeft()
-            elif (route[i] == "R"):
-                self.moveRight()
-            else:
-                return False
-        return True
+    def followPath(self, direction): # follows the directional string of another object 
+        if (direction == "U"):
+            self.moveUp()
+        elif (direction == "D"):
+            self.moveDown()
+        elif (direction == "L"):
+            self.moveLeft()
+        elif (direction == "R"):
+            self.moveRight()
+        return self
 
-    def followPathDetailed(self, route):
-        print("Initial State:")
-        self.printGrid()
-        for i in range(len(route)):
-            if (route[i] == "U"):
-                self.moveUp()
-                print("Move #" + str(i+1) + ": ")
-                print("Move Blank Upwards")
-                self.printGridManhattan()
-            elif (route[i] == "D"):
-                self.moveDown()
-                print("Move #" + str(i+1) + ": ")
-                print("Move Blank Downwards")
-                self.printGridManhattan()
-            elif (route[i] == "L"):
-                self.moveLeft()
-                print("Move #" + str(i+1) + ": ")
-                print("Move Blank Left")
-                self.printGridManhattan()
-            elif (route[i] == "R"):
-                self.moveRight()
-                print("Move #" + str(i+1) + ": ")
-                print("Move Blank Right")
-                self.printGridManhattan()
-            else:
-                return False
-        return True
-
-    def makeHash(self):
+    def getHash(self): # returns the hash key for the board state, does not consider other factors like path 
         h = ""
-        for i in range(len(self.list)):
-            h += str(self.list[i]) + " "
+        for i in range(len(self.board)):
+            h += str(self.board[i]) + " "
         return hash(h)
 
-    def getCost(self):
+    def getDepth(self): # returns the depth by counting the length of the path taken thus far
         return len(self.path)
 
-    def getMisplacedTiles(self):
+    def getMisplacedTiles(self): # counts the number of misplaced tiles
         cnt = 0
-        for i in range(len(self.list)):
-            if i+1 != self.list[i]:
+        for i in range(len(self.board)):
+            if i+1 != self.board[i]:
                 cnt += 1
         return cnt
 
-    def getManhattanDist(self):
+    def getManhattanDistance(self): # counts the manhattan distance, finds the "correct" row and column and subtracts the current one.
         count = 0
-        for i in range(len(self.list)):
+        for i in range(len(self.board)):
             correctRow = int((i)/3)+1
             correctCol = int(i%3)+1
-            row = int((self.list[i]-1)/3)+1
-            col = int((self.list[i]-1)%3)+1
+            row = int((self.board[i]-1)/3)+1
+            col = int((self.board[i]-1)%3)+1
             count += abs(correctRow-row)
             count += abs(correctCol-col)
         return count
 
-    def getMisplacedTilesHeuristic(self):
-        return int(self.getMisplacedTiles() + self.getCost())
+    def getMisplacedTilesHeuristic(self): # adds to cost to get value for a-star
+        return int(self.getMisplacedTiles() + self.getDepth())
     
-    def getManhattanHeuristic(self):
-        return int(self.getManhattanDist() + self.getCost())
+    def getManhattanHeuristic(self): # adds to cost to get value for a-star
+        return int(self.getManhattanDistance() + self.getDepth())
 
