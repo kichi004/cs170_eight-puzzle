@@ -45,12 +45,6 @@ class Slider:
                 blankPos = i
         return blankPos
 
-    def copy(self, Slider):
-        self.list = Slider.list
-        self.len = Slider.len
-        self.pos = Slider.pos
-        self.path = Slider.path
-
     def printGrid(self):
         cnt = 1
         print("[[", end="")
@@ -69,6 +63,16 @@ class Slider:
             else:
                 print(", ", end="")
         print("]", end="\n\n")
+
+    def printGridMisplaced(self):
+        print("H(n) is equal to ", end="")
+        print(str(self.getMisplacedTilesHeuristic()))
+        self.printGrid()
+
+    def printGridManhattan(self):
+        print("H(n) is equal to ", end="")
+        print(str(self.getManhattanHeuristic()))
+        self.printGrid()
 
     def checkBounds(self, p):
         if (p > len(self.list)-1):
@@ -142,29 +146,57 @@ class Slider:
             if (route[i] == "U"):
                 self.moveUp()
                 print("Move #" + str(i+1) + ": ")
-
                 print("Move Blank Upwards")
-                self.printGrid()
+                self.printGridManhattan()
             elif (route[i] == "D"):
                 self.moveDown()
                 print("Move #" + str(i+1) + ": ")
                 print("Move Blank Downwards")
-                self.printGrid()
+                self.printGridManhattan()
             elif (route[i] == "L"):
                 self.moveLeft()
                 print("Move #" + str(i+1) + ": ")
                 print("Move Blank Left")
-                self.printGrid()
+                self.printGridManhattan()
             elif (route[i] == "R"):
                 self.moveRight()
                 print("Move #" + str(i+1) + ": ")
                 print("Move Blank Right")
-                self.printGrid()
+                self.printGridManhattan()
             else:
                 return False
         return True
 
+    def makeHash(self):
+        h = ""
+        for i in range(len(self.list)):
+            h += str(self.list[i]) + " "
+        return hash(h)
 
+    def getCost(self):
+        return len(self.path)
 
+    def getMisplacedTiles(self):
+        cnt = 0
+        for i in range(len(self.list)):
+            if i+1 != self.list[i]:
+                cnt += 1
+        return cnt
+
+    def getManhattanDist(self):
+        count = 0
+        for i in range(len(self.list)):
+            correctRow = int((i)/3)+1
+            correctCol = int(i%3)+1
+            row = int((self.list[i]-1)/3)+1
+            col = int((self.list[i]-1)%3)+1
+            count += abs(correctRow-row)
+            count += abs(correctCol-col)
+        return count
+
+    def getMisplacedTilesHeuristic(self):
+        return int(self.getMisplacedTiles() + self.getCost())
     
+    def getManhattanHeuristic(self):
+        return int(self.getManhattanDist() + self.getCost())
 
