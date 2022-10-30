@@ -44,13 +44,7 @@ class Slider:
             if self.list[blankPos] < self.list[i]:
                 blankPos = i
         return blankPos
-
-    def copy(self, Slider):
-        self.list = Slider.list
-        self.len = Slider.len
-        self.pos = Slider.pos
-        self.path = Slider.path
-
+        
     def printGrid(self):
         cnt = 1
         print("[[", end="")
@@ -163,6 +157,12 @@ class Slider:
             else:
                 return False
         return True
+
+    def makeHash(self):
+        h = ""
+        for i in range(len(self.list)):
+            h += str(self.list[i]) + " "
+        return hash(h)
 
 
 

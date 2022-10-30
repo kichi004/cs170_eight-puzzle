@@ -3,12 +3,11 @@ import py_compile
 from slider import Slider
 from queue import Queue
 
-list = [1, 2, 3, 4, 5, 6, 7, 9, 8]
+list = [8, 7, 1, 6, 9, 2, 5, 4, 3]
 
 x = Slider()
 x.input(list)
+q = Queue()
 
-y = Slider()
-y.copy(x)
-
-y.printGrid()
+a = q.uniform_search(x)
+x.followPathDetailed(a.getPath())
