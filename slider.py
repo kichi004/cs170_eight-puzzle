@@ -158,8 +158,8 @@ class Slider:
         return count
 
     def getMisplacedTilesHeuristic(self): # adds to cost to get value for a-star
-        return int(self.getMisplacedTiles() + self.getDepth())
+        return self.getMisplacedTiles() + (self.getDepth()*0.5)
     
     def getManhattanHeuristic(self): # adds to cost to get value for a-star
-        return int(self.getManhattanDistance() + (self.getDepth()*2))
+        return self.getManhattanDistance() + (self.getDepth()*1.2)
 
