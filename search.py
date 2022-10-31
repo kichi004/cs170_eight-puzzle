@@ -11,12 +11,14 @@ class Search:
         self.maxQueueSize = 0
 
     def search(self):
+        self.pastDict[self.origin.getHash()] = self.makeHeuristicValue(self.origin)
         self.nodes.append(self.origin)
         numParsed = 0
         while(True):
             if len(self.nodes) > self.maxQueueSize:
                 self.maxQueueSize = len(self.nodes)
             if not self.nodes:
+                print (self.getName() + " checked through " + str(numParsed) + " states and failed to find a solution.\n")
                 return self.origin
             current = self.nodes.pop(0)
             numParsed += 1
@@ -24,6 +26,7 @@ class Search:
                 print (self.getName() + " checked through " + str(numParsed) + " states and found a solution at depth " + str(current.getDepth()) + ".")
                 self.parsed = numParsed
                 return current
+            # print("current is " + current.getPath(), end=", ")
             self.queue(current)
 
     def inPast(self, Slider):
@@ -31,22 +34,30 @@ class Search:
 
     def getIndex(self, value):
         for i in range(len(self.nodes)):
-            if self.pastDict[self.nodes[i].getHash()] > value:
+            if (self.makeHeuristicValue(self.nodes[i])) > value:
                 return int(i)
-        return len(self.nodes)-1
+        return len(self.nodes)
+
+    def findLowest(self):
+        for i in self.nodes:
+            print(str(self.makeHeuristicValue(i)),end=", ")
 
     def queue(self, Slider):
         up = copy.deepcopy(Slider)
         if up.moveUp():
+            #print(self.makeHeuristicValue(up), end="!")
             self.appendToQueue(up)
         down = copy.deepcopy(Slider)
         if down.moveDown():
+            #print(self.makeHeuristicValue(down), end="!")
             self.appendToQueue(down)
         left = copy.deepcopy(Slider)
         if left.moveLeft():
+            #print(self.makeHeuristicValue(left), end="!")
             self.appendToQueue(left)
         right = copy.deepcopy(Slider)
         if right.moveRight():
+            #print(self.makeHeuristicValue(right), end="!")
             self.appendToQueue(right)
 
     def followSolution(self, route):
@@ -110,4 +121,5 @@ class ManhattanSearch(Search):
         if not self.inPast(Slider):
             heuristicValue = self.makeHeuristicValue(Slider)
             self.pastDict[Slider.getHash()] = heuristicValue
+            # print(self.getIndex(heuristicValue), end="@")
             self.nodes.insert(self.getIndex(heuristicValue), Slider)

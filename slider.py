@@ -20,8 +20,8 @@ class Slider:
 
     def isCorrect(self): # checks if the board is correct
         prev = 0
-        for i in range(len(self.board)):
-            if (self.board[i] > prev):
+        for i in self.board:
+            if (i > prev):
                 prev += 1
             else:
                 return False
@@ -73,8 +73,7 @@ class Slider:
             return False
         elif (p < 0):
             return False
-        else:
-            return True
+        return True
     
     def moveUp(self): # moves the blank up by subtracting 3 
         newPos = self.pos-3
@@ -132,8 +131,8 @@ class Slider:
 
     def getHash(self): # returns the hash key for the board state, does not consider other factors like path 
         h = ""
-        for i in range(len(self.board)):
-            h += str(self.board[i]) + " "
+        for i in self.board:
+            h += str(i) + " "
         return hash(h)
 
     def getDepth(self): # returns the depth by counting the length of the path taken thus far
@@ -149,17 +148,18 @@ class Slider:
     def getManhattanDistance(self): # counts the manhattan distance, finds the "correct" row and column and subtracts the current one.
         count = 0
         for i in range(len(self.board)):
-            correctRow = int((i)/3)+1
-            correctCol = int(i%3)+1
-            row = int((self.board[i]-1)/3)+1
-            col = int((self.board[i]-1)%3)+1
-            count += abs(correctRow-row)
-            count += abs(correctCol-col)
+            if (i != self.pos):
+                correctRow = int((i)/3)+1
+                correctCol = int(i%3)+1
+                row = int((self.board[i]-1)/3)+1
+                col = int((self.board[i]-1)%3)+1
+                count += abs(correctRow-row)
+                count += abs(correctCol-col)
         return count
 
     def getMisplacedTilesHeuristic(self): # adds to cost to get value for a-star
         return int(self.getMisplacedTiles() + self.getDepth())
     
     def getManhattanHeuristic(self): # adds to cost to get value for a-star
-        return int(self.getManhattanDistance() + self.getDepth())
+        return int(self.getManhattanDistance() + (self.getDepth()*2))
 
