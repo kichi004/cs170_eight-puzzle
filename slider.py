@@ -49,7 +49,7 @@ class Slider:
                 blankPosition = i
         return blankPosition
 
-    def printGrid(self): # prints the grid, adaptive for different sizes but doesn't look great with double digits
+    def print(self): # prints the grid, adaptive for different sizes but doesn't look great with double digits
         cnt = 1
         print("[[", end="")
         for x in range(len(self.board)):
@@ -68,7 +68,7 @@ class Slider:
                 print(", ", end="")
         print("]", end="\n\n")
 
-    def checkBounds(self, p): # makes sure that the new position on the board does not go outside of the range of the list
+    def isBounded(self, p): # returns true if the position does not go out of bounds
         if (p > len(self.board)-1):
             return False
         elif (p < 0):
@@ -77,7 +77,7 @@ class Slider:
     
     def moveUp(self): # moves the blank up by subtracting 3 
         newPos = self.pos-3
-        if (self.checkBounds(newPos)):
+        if (self.isBounded(newPos)):
             self.swap(self.pos, newPos)
             self.pos = newPos
             self.path += "U"
@@ -87,7 +87,7 @@ class Slider:
     
     def moveDown(self): # moves the blank down by adding 3
         newPos = self.pos+3
-        if (self.checkBounds(newPos)):
+        if (self.isBounded(newPos)):
             self.swap(self.pos, newPos)
             self.pos = newPos
             self.path += "D"
@@ -138,14 +138,16 @@ class Slider:
     def getDepth(self): # returns the depth by counting the length of the path taken thus far
         return len(self.path)
 
-    def getMisplacedTiles(self): # counts the number of misplaced tiles
+    def getMisplacedTilesHeuristic(self): # counts the number of misplaced tiles
         cnt = 0
         for i in range(len(self.board)):
             if i+1 != self.board[i]:
                 cnt += 1
+            if self.board[i] == 9:
+                cnt -= 1
         return cnt
 
-    def getManhattanDistance(self): # counts the manhattan distance, finds the "correct" row and column and subtracts the current one.
+    def getManhattanDistanceHeuristic(self): # counts the manhattan distance, finds the "correct" row and column of a number and subtracts the one.
         count = 0
         for i in range(len(self.board)):
             if (i != self.pos):
@@ -157,9 +159,11 @@ class Slider:
                 count += abs(correctCol-col)
         return count
 
-    def getMisplacedTilesHeuristic(self): # adds to cost to get value for a-star
-        return self.getMisplacedTiles() + (self.getDepth()*0.5)
+    def getMisplacedTilesPriorityValue(self): # adds to depth to get h(n) + g(n), includes weight modification
+        return self.getMisplacedTilesHeuristic() + (self.getDepth()*0.6)
+        # need 0.6 for optimality with list16
     
-    def getManhattanHeuristic(self): # adds to cost to get value for a-star
-        return self.getManhattanDistance() + (self.getDepth()*1.2)
+    def getManhattanDistancePriorityValue(self): # adds to depth to get h(n) + g(n)
+        return self.getManhattanDistanceHeuristic() + (self.getDepth()*1.1)
+        # most optimal is 1.1
 
